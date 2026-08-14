@@ -5,7 +5,7 @@ Verified from public model cards and project licenses. Do not treat this as lega
 | Component                               | Source                            | License (as documented upstream)                                                    |
 | --------------------------------------- | --------------------------------- | ----------------------------------------------------------------------------------- |
 | This repository                         | Deal Truth ML                     | MIT (`LICENSE`)                                                                     |
-| Hono                                    | https://github.com/honojs/hono    | MIT                                                                                 |
+| NestJS                                  | https://github.com/nestjs/nest    | MIT                                                                                 |
 | Zod                                     | https://github.com/colinhacks/zod | MIT                                                                                 |
 | Cloudflare Workers / Workers AI hosting | Cloudflare                        | Platform terms; not a model license                                                 |
 | `@cf/openai/gpt-oss-120b`               | OpenAI gpt-oss via Cloudflare     | Apache-2.0 (OpenAI gpt-oss model card: https://huggingface.co/openai/gpt-oss-120b ) |

@@ -1,9 +1,0 @@
-node_modules
-.git
-.wrangler
-.dev.vars
-.env
-coverage
-dist
-open_gong_hackathon_chat_export.md
-.cursor

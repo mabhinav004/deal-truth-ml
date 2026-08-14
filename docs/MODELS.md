@@ -1,6 +1,6 @@
 # Models
 
-All inference is Cloudflare Workers AI. Model IDs are wrangler vars and can be overridden.
+All inference is Cloudflare Workers AI. Model IDs are env vars and can be overridden.
 
 | Role    | ID                              | Notes                                                                                         |
 | ------- | ------------------------------- | --------------------------------------------------------------------------------------------- |

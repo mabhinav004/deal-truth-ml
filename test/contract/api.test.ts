@@ -1,28 +1,29 @@
 import { describe, expect, it } from 'vitest';
-import { createApp } from '../../src/index';
-import { FakeAi, testEnv } from '../helpers';
+import { FakeAi, testEnv, withApp } from '../helpers';
 
 async function post(
   path: string,
   body: unknown,
   ai: FakeAi = new FakeAi(),
 ): Promise<{ status: number; json: Record<string, unknown>; ai: FakeAi }> {
-  const app = createApp(testEnv(ai));
-  const response = await app.request(`http://ml${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Request-ID': 'contract-1' },
-    body: JSON.stringify(body),
+  return withApp(testEnv(ai), async (app) => {
+    const response = await app.request(`http://ml${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Request-ID': 'contract-1' },
+      body: JSON.stringify(body),
+    });
+    return { status: response.status, json: (await response.json()) as Record<string, unknown>, ai };
   });
-  return { status: response.status, json: (await response.json()) as Record<string, unknown>, ai };
 }
 
 describe('v1 contract', () => {
   it('returns the sales-label catalogue', async () => {
-    const app = createApp(testEnv(new FakeAi()));
-    const response = await app.request('http://ml/v1/sales-labels');
-    const body = (await response.json()) as { labels: { id: string }[] };
-    expect(response.status).toBe(200);
-    expect(body.labels.some((label) => label.id === 'security_blocker')).toBe(true);
+    await withApp(testEnv(new FakeAi()), async (app) => {
+      const response = await app.request('http://ml/v1/sales-labels');
+      const body = (await response.json()) as { labels: { id: string }[] };
+      expect(response.status).toBe(200);
+      expect(body.labels.some((label) => label.id === 'security_blocker')).toBe(true);
+    });
   });
 
   it('classifies with threshold filtering', async () => {

@@ -1,38 +1,38 @@
-# Deal Truth ML — deploy in one hour
+# Deal Truth ML — deploy
 
-Pair with `deal-truth` [docs/DEPLOYMENT.md](../../deal-truth/docs/DEPLOYMENT.md).
+Pair with `deal-truth` docs/DEPLOYMENT.md.
 
-## Local (talk to the API)
+## Local
 
 ```bash
 cp .env.example .env
-make login          # or set CLOUDFLARE_API_TOKEN
-# set NGROK_AUTHTOKEN + a Dev Domain that is NOT the API domain
-make up             # :8081 + ngrok :4041
+# set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID
+make setup
+make dev             # NestJS :8081
 ```
 
-The API `.env.example` already has `ML_SERVICE_BASE_URL=http://host.docker.internal:8081`.
+On the API: `ML_SERVICE_BASE_URL=http://localhost:8081`.
 
-## Production (Cloudflare Worker)
+## Production (Render)
 
-```bash
-npx wrangler secret put INTERNAL_API_TOKEN
-npx wrangler deploy
-```
+| Field | Value |
+| --- | --- |
+| Runtime | Node 20+ |
+| Build | `npm ci && npm run build` |
+| Start | `npm run start:prod` |
+| Health | `/health/live` |
 
-You must add:
+| Item | Where |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Render secret |
+| `CLOUDFLARE_ACCOUNT_ID` | Render env (32-char hex) |
+| `INTERNAL_API_TOKEN` | Render secret |
+| `HUSKY=0` | Render env |
 
-| Item                 | Where                                                                         |
-| -------------------- | ----------------------------------------------------------------------------- |
-| `INTERNAL_API_TOKEN` | `wrangler secret put` (not Git)                                               |
-| Cloudflare account   | already logged in, or `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` for CI |
-
-Already in `wrangler.jsonc` (no fill): `ENABLE_GENERATION`, model IDs, batch limits, embedding dimension.
-
-Then on the **API** VM:
+Then on the **API**:
 
 ```text
-ML_SERVICE_BASE_URL=https://deal-truth-ml.<ACCOUNT>.workers.dev
+ML_SERVICE_BASE_URL=https://<your-service>.onrender.com
 ML_SERVICE_API_KEY=<same INTERNAL_API_TOKEN>
 ML_GENERATION_ENABLED=true
 ```

@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ES2022",
-    "moduleResolution": "Bundler",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "lib": ["ES2022"],
-    "types": ["@cloudflare/workers-types", "node"],
+    "types": ["node"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
@@ -13,8 +13,10 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "noEmit": true,
     "rootDir": "."
   },
-  "include": ["src", "test", "worker-configuration.d.ts", "src/md.d.ts"]
+  "include": ["src", "test"]
 }

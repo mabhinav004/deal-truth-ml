@@ -136,7 +136,7 @@ Example: “I absolutely love this product, but finance froze our budget until n
 
 ### Dropped from the original ONNX design
 
-Local GoEmotions, ModernBERT zero-shot, local BGE-small (384-dim), FLAN-T5, SeaweedFS as the production blob (Supabase Storage instead), Postgres on the VM. Docker in this repo is **only** local `wrangler dev` on :8081 — it does not ship model weights.
+Local GoEmotions, ModernBERT zero-shot, local BGE-small (384-dim), FLAN-T5, SeaweedFS as the production blob (Supabase Storage instead), Postgres on the VM. This repo is NestJS on Node — it does not ship model weights.
 
 Compat aliases `POST /classify`, `/emotion`, `/embed`, `/generate` still match the current Python `DealTruthMLClient` so the running backend keeps working during migration.
 
@@ -145,23 +145,21 @@ Compat aliases `POST /classify`, `/emotion`, `/embed`, `/generate` still match t
 ## 5. Local run (this repo + API)
 
 ```bash
-cd deal-truth-ml && make setup && make up     # :8081
+cd deal-truth-ml && make setup && make dev     # :8081
 # deal-truth/.env:
-#   ML_SERVICE_BASE_URL=http://localhost:8081             # API on host
-#   ML_SERVICE_BASE_URL=http://host.docker.internal:8081  # API in Docker
+#   ML_SERVICE_BASE_URL=http://localhost:8081
 #   ML_SERVICE_API_KEY=
 cd deal-truth && make up
 ```
 
-`CLOUDFLARE_API_TOKEN` (Docker without `wrangler login`) or `make login` (host) is required. ngrok: `NGROK_AUTHTOKEN` plus a **distinct** `NGROK_DOMAIN` from the API. Details: [README](../README.md), [HOSTING.md](HOSTING.md).
+`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are required. Details: [README](../README.md), [HOSTING.md](HOSTING.md).
 
 ## 6. Backend status (`deal-truth`, not this repo)
 
 Done (as of 2026-08-13):
 
-1. ~~Wire the API~~ — the API resolves this Worker via `ML_SERVICE_BASE_URL` →
-   `https://{ML_NGROK_DOMAIN}` → `http://localhost:8081`; `make up` here writes
-   `ML_NGROK_DOMAIN` into `deal-truth/.env`. Bearer = `INTERNAL_API_TOKEN`.
+1. ~~Wire the API~~ — the API resolves this NestJS service via `ML_SERVICE_BASE_URL`
+   (`http://localhost:8081` locally, or the Render HTTPS URL). Bearer = `INTERNAL_API_TOKEN`.
 2. ~~Vector migration~~ — `transcript_chunks.embedding` is `VECTOR(1024)` (API migration
    `0002_embedding_1024`); Qwen3 1024-dim embeddings index cleanly.
 3. Slug labels (`pain_point`) are mapped back to extractor keys API-side
@@ -200,7 +198,7 @@ Still open:
 
 ## 8. Security notes
 
-- No secrets in Git. Worker token is a wrangler secret.
+- No secrets in Git. Tokens live in host env (`.env` locally, Render secrets in prod).
 - Health endpoints are public; inference routes require bearer auth when the token is configured.
 - Logs: request ID, counts, model, duration, named error — never transcript text.
 - Backend must never expose PyAI keys or storage credentials to the frontend.

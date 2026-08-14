@@ -1,4 +1,4 @@
-.PHONY: install setup login lint format format-check typecheck test test-live bootstrap check smoke dev up down restart docker-build compose-up compose-down deploy
+.PHONY: install setup lint format format-check typecheck test test-live bootstrap check smoke dev deploy
 
 install:
 	npm install
@@ -6,19 +6,13 @@ install:
 bootstrap:
 	bash scripts/bootstrap_env.sh
 
-login:
-	npx wrangler login
-	npx wrangler whoami
-
 setup: install bootstrap
 	@echo ""
 	@echo "Next:"
-	@echo "  1. npx wrangler login     (or set CLOUDFLARE_API_TOKEN in .env for Docker)"
-	@echo "  2. make dev               host wrangler on :8081"
-	@echo "     or  make up            Docker wrangler on :8081"
-	@echo "  3. After Worker code changes: make restart"
-	@echo "  4. In deal-truth/.env set ML_SERVICE_BASE_URL to localhost:8081 or the ngrok HTTPS URL"
-	@echo "  5. Restart deal-truth api + worker (`cd ../deal-truth && make restart`)"
+	@echo "  1. Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in .env"
+	@echo "  2. make dev               NestJS on :8081"
+	@echo "  3. In deal-truth/.env set ML_SERVICE_BASE_URL=http://localhost:8081"
+	@echo "  4. Restart deal-truth api + worker"
 
 lint:
 	npm run lint
@@ -47,30 +41,10 @@ smoke: check
 	  -d '{"texts":["We cannot buy until security approves it."]}'
 	@echo
 
-# Host process (same role as deal-truth `make api`)
 dev: bootstrap
-	npx wrangler whoami
-	npx wrangler dev --ip 0.0.0.0 --port 8081
-
-# Docker stack (same role as deal-truth `make up`)
-up:
-	bash scripts/docker_up.sh
-
-# Fastest stack bounce after Worker code/config changes (same role as deal-truth `make restart`).
-# Rebuilds the ml image, recreates ml + ngrok, waits for health.
-restart:
-	bash scripts/docker_restart.sh
-
-down:
-	docker compose down --remove-orphans
-
-docker-build:
-	docker build -t deal-truth-ml:local .
-
-compose-up: up
-
-compose-down: down
+	npm run dev
 
 deploy:
-	npx wrangler secret put INTERNAL_API_TOKEN
-	npx wrangler deploy
+	@echo "Build: npm ci && npm run build"
+	@echo "Start: npm run start:prod"
+	@echo "Set CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, INTERNAL_API_TOKEN on the host."

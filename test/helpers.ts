@@ -1,4 +1,15 @@
+import { createApp, type HttpApp } from '../src/http/create-app';
+import type { Env } from '../src/env';
 import { SALES_LABELS } from '../src/taxonomies/sales-labels';
+
+export async function withApp<T>(env: Env, fn: (app: HttpApp) => Promise<T>): Promise<T> {
+  const app = await createApp(env);
+  try {
+    return await fn(app);
+  } finally {
+    await app.close();
+  }
+}
 
 function allMessageText(inputs: Record<string, unknown>): string {
   const messages = inputs.messages;
@@ -26,6 +37,10 @@ export class FakeAi {
   failQuota = false;
   invalidJsonOnce = false;
   calls: { model: string; inputs: Record<string, unknown> }[] = [];
+
+  isReady(): boolean {
+    return true;
+  }
 
   async run(model: string, inputs: Record<string, unknown> = {}): Promise<unknown> {
     this.calls.push({ model, inputs });

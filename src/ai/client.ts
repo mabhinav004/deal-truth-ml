@@ -9,6 +9,7 @@ export interface ChatMessage {
 
 export interface AiBinding {
   run(model: string, inputs: Record<string, unknown>): Promise<unknown>;
+  isReady(): boolean;
 }
 
 // Chat-completion metadata must never be mistaken for generated text
