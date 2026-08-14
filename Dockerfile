@@ -14,10 +14,15 @@ COPY wrangler.jsonc tsconfig.json ./
 COPY src ./src
 COPY docs ./docs
 COPY worker-configuration.d.ts ./
+COPY scripts/start.sh ./scripts/start.sh
 
+RUN chmod +x scripts/start.sh \
+  && npx wrangler deploy --dry-run --outdir dist
+
+ENV PORT=8081
 EXPOSE 8081
 
 HEALTHCHECK --interval=5s --timeout=5s --start-period=40s --retries=12 \
   CMD curl -fsS http://127.0.0.1:8081/health/live || exit 1
 
-CMD ["npx", "wrangler", "dev", "--ip", "0.0.0.0", "--port", "8081"]
+CMD ["bash", "scripts/start.sh"]

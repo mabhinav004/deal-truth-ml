@@ -19,8 +19,11 @@
     "RERANK_MODEL_ID": "@cf/baai/bge-reranker-base",
     "EMBEDDING_DIMENSION": "1024",
   },
+  "dev": {
+    "ip": "0.0.0.0",
+  },
   "observability": {
     "enabled": true,
   },
-  "rules": [{ "type": "Text", "globs": ["**/*.md"] }],
+  "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": false }],
 }

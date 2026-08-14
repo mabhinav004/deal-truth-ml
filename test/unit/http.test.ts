@@ -7,6 +7,14 @@ async function jsonOf(response: Response): Promise<Record<string, unknown>> {
 }
 
 describe('auth and health', () => {
+  it('serves root without auth so host probes do not 400', async () => {
+    const app = createApp(testEnv(new FakeAi(), { INTERNAL_API_TOKEN: 'secret' }));
+    const response = await app.request('http://ml/');
+    expect(response.status).toBe(200);
+    const body = await jsonOf(response);
+    expect(body.health).toBe('/health/live');
+  });
+
   it('serves live and ready without auth', async () => {
     const app = createApp(testEnv(new FakeAi(), { INTERNAL_API_TOKEN: 'secret' }));
     const live = await app.request('http://ml/health/live');

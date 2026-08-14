@@ -210,6 +210,14 @@ export function createApp(env: Env): Hono<AppEnv> {
     await next();
   });
 
+  app.get('/', (c) =>
+    c.json({
+      service: 'deal-truth-ml',
+      docs: '/docs',
+      health: '/health/live',
+    }),
+  );
+
   app.get('/health/live', (c) => c.json({ status: 'ok' }));
 
   app.get('/openapi.json', (c) => c.json(openApiSpec));
